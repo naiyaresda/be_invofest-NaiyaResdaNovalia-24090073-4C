@@ -12,4 +12,3 @@ router.put("/:id", updatePembicara);
 // menghapus data pembicara berdasarkan id
 router.delete("/:id", deletePembicara);
 export default router;
-//# sourceMappingURL=pembicaraRoute.js.map

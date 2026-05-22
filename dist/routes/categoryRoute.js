@@ -12,4 +12,3 @@ router.put("/:id", updateCategory);
 // menghapus category berdasarkan id
 router.delete("/:id", deleteCategory);
 export default router;
-//# sourceMappingURL=categoryRoute.js.map

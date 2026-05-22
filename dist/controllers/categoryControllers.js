@@ -113,4 +113,3 @@ export const deleteCategory = async (req, res) => {
         });
     }
 };
-//# sourceMappingURL=categoryControllers.js.map

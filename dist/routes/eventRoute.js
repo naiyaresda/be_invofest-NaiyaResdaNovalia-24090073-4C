@@ -12,4 +12,3 @@ router.put("/:id", updateEvent);
 // menghapus data event berdasarkan id
 router.delete("/:id", deleteEvent);
 export default router;
-//# sourceMappingURL=eventRoute.js.map

@@ -111,4 +111,3 @@ export const deletePembicara = async (req, res) => {
         });
     }
 };
-//# sourceMappingURL=pembicaraControllers.js.map

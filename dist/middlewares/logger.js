@@ -6,4 +6,3 @@ export const checkAdmin = (req, res, next) => {
     console.log("Checking Admin...");
     next();
 };
-//# sourceMappingURL=logger.js.map

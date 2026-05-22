@@ -119,4 +119,3 @@ export const deleteEvent = async (req, res) => {
         });
     }
 };
-//# sourceMappingURL=eventControllers.js.map
