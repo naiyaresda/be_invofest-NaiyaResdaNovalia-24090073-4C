@@ -1,100 +1,151 @@
 import { Request, Response } from "express";
-import { Pembicara } from "../types/pembicara";
+import { prisma } from "../lib/db";
 
-let pembicaras: Pembicara[] = [];
+// 1. Menampilkan semua pembicara
+export const getPembicaras = async (req: Request, res: Response) => {
 
-// 1. menampilkan semua data pembicara
-export const getPembicaras = (req: Request, res: Response) => {
-    res.json(pembicaras);
-};
+    try {
 
-// 2. menambahkan data pembicara
-export const createPembicara = (req: Request, res: Response) => {
+        const pembicaras = await prisma.pembicara.findMany();
 
-    const { name, role, foto } = req.body;
+        res.status(200).json(pembicaras);
 
-    // validasi sederhana
-    if (!name || !role || !foto) {
-        return res.status(500).json({
-            message: "Name, Role dan Foto harus diisi"
+    } catch (error: any) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Gagal mengambil data pembicara",
+            error: error.message,
         });
     }
-
-    // membuat data baru
-    const newPembicara: Pembicara = {
-        id: Date.now(),
-        name: name,
-        role: role,
-        foto: foto,
-    };
-
-    // simpan data
-    pembicaras.push(newPembicara);
-
-    // response berhasil
-    res.status(200).json({
-        message: "Data berhasil disimpan",
-        pembicara: newPembicara
-    });
 };
 
-// 3. menampilkan detail pembicara berdasarkan id
-export const getPembicara = (req: Request, res: Response) => {
+// 2. Menambahkan pembicara
+export const createPembicara = async (req: Request, res: Response) => {
 
-    const id = parseInt(req.params.id as string);
+    try {
 
-    const pembicara = pembicaras.find((item) => item.id === id);
+        const { name, role, image } = req.body;
 
-    if (!pembicara) {
-        return res.status(404).json({
-            message: "Data pembicara tidak ditemukan"
+        // validasi
+        if (!name || !role || !image) {
+            return res.status(400).json({
+                message: "Name, Role, dan Image harus diisi",
+            });
+        }
+
+        const newPembicara = await prisma.pembicara.create({
+            data: { name, role, image,
+                createdAt: new Date(),
+            },
+        });
+
+        res.status(201).json({
+            message: "Pembicara berhasil ditambahkan",
+            pembicara: newPembicara,
+        });
+
+    } catch (error: any) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Gagal menambahkan pembicara",
+            error: error.message,
         });
     }
-
-    res.status(200).json(pembicara);
 };
 
-// 4. mengupdate data pembicara berdasarkan id
-export const updatePembicara = (req: Request, res: Response) => {
+// 3. Detail pembicara
+export const getPembicara = async (req: Request, res: Response) => {
 
-    const id = parseInt(req.params.id as string);
+    try {
 
-    const pembicara = pembicaras.find((item) => item.id === id);
+        const id = Number(req.params.id);
 
-    if (!pembicara) {
-        return res.status(404).json({
-            message: "Data pembicara tidak ditemukan"
+        const pembicara = await prisma.pembicara.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!pembicara) {
+            return res.status(404).json({
+                message: "Pembicara tidak ditemukan",
+            });
+        }
+
+        res.status(200).json(pembicara);
+
+    } catch (error: any) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Gagal mengambil detail pembicara",
+            error: error.message,
         });
     }
-
-    const { name, role, foto } = req.body;
-
-    pembicara.name = name || pembicara.name;
-    pembicara.role = role || pembicara.role;
-    pembicara.foto = foto || pembicara.foto;
-
-    res.status(200).json({
-        message: "Data berhasil diupdate",
-        pembicara
-    });
 };
 
-// 5. menghapus data pembicara berdasarkan id
-export const deletePembicara = (req: Request, res: Response) => {
+// 4. Update pembicara
+export const updatePembicara = async (req: Request, res: Response) => {
 
-    const id = parseInt(req.params.id as string);
+    try {
 
-    const index = pembicaras.findIndex((item) => item.id === id);
+        const id = Number(req.params.id);
 
-    if (index === -1) {
-        return res.status(404).json({
-            message: "Data pembicara tidak ditemukan"
+        const { name, role, image } = req.body;
+
+        const pembicara = await prisma.pembicara.update({
+            where: {
+                id,
+            },
+            data: { name, role, image,
+            },
+        });
+
+        res.status(200).json({
+            message: "Pembicara berhasil diupdate",
+            pembicara,
+        });
+
+    } catch (error: any) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Gagal update pembicara",
+            error: error.message,
         });
     }
+};
 
-    pembicaras.splice(index, 1);
+// 5. Hapus pembicara
+export const deletePembicara = async (req: Request, res: Response) => {
 
-    res.status(200).json({
-        message: "Data berhasil dihapus"
-    });
+    try {
+
+        const id = Number(req.params.id);
+
+        await prisma.pembicara.delete({
+            where: {
+                id,
+            },
+        });
+
+        res.status(200).json({
+            message: "Pembicara berhasil dihapus",
+        });
+
+    } catch (error: any) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Gagal menghapus pembicara",
+            error: error.message,
+        });
+    }
 };
